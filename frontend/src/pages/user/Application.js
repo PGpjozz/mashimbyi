@@ -9,6 +9,7 @@ import {
   Snackbar,
   Alert,
   InputLabel,
+  InputAdornment,
 } from "@mui/material";
 
 const qualifications = [
@@ -29,6 +30,7 @@ const Application = () => {
     gender: "",
     email: "",
     phone: "",
+    id_number: "", // <-- NEW FIELD
     course: "", // <-- change from program to course
     qualification: "",
     motivation: "",
@@ -84,6 +86,7 @@ const Application = () => {
           gender: "",
           email: "",
           phone: "",
+          id_number: "", // <-- RESET FIELD
           course: "", // <-- change from program to course
           qualification: "",
           motivation: "",
@@ -185,6 +188,17 @@ const Application = () => {
           required
           sx={{ mb: 2 }}
         />
+        <TextField
+          label="ID Number"
+          name="id_number"
+          value={form.id_number}
+          onChange={handleChange}
+          fullWidth
+          required
+          sx={{ mb: 2 }}
+          inputProps={{ maxLength: 13, pattern: "\\d{13}" }} // only digits, max 13
+          helperText="ID number must be exactly 13 digits"
+        />
 
         <TextField
           select
@@ -230,7 +244,7 @@ const Application = () => {
           accept=".pdf,.jpg,.jpeg,.png"
           onChange={handleChange}
           style={{ marginBottom: 16, width: "100%" }}
-          required
+          required // <-- REQUIRED
         />
 
         <InputLabel htmlFor="id_doc">Upload ID</InputLabel>
@@ -241,7 +255,7 @@ const Application = () => {
           accept=".pdf,.jpg,.jpeg,.png"
           onChange={handleChange}
           style={{ marginBottom: 16, width: "100%" }}
-          required
+          required // <-- REQUIRED
         />
 
         <InputLabel htmlFor="cv">Upload CV</InputLabel>
@@ -252,7 +266,7 @@ const Application = () => {
           accept=".pdf,.doc,.docx"
           onChange={handleChange}
           style={{ marginBottom: 16, width: "100%" }}
-          required
+          required // <-- REQUIRED
         />
 
         <TextField
@@ -263,7 +277,6 @@ const Application = () => {
           fullWidth
           multiline
           rows={4}
-          required
           sx={{ mb: 2 }}
         />
 

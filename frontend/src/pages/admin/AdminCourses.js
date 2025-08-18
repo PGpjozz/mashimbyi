@@ -13,8 +13,16 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Paper,
+  Box,
+  Chip,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import MenuBookIcon from "@mui/icons-material/MenuBook";
+import GroupIcon from "@mui/icons-material/Group";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
 
 const AdminCourses = () => {
   const [courses, setCourses] = useState([]);
@@ -30,7 +38,7 @@ const AdminCourses = () => {
 
   useEffect(() => {
     const fetchCourses = async () => {
-      const token = localStorage.getItem("adminToken"); // <-- FIXED
+      const token = localStorage.getItem("adminToken");
       if (!token) {
         navigate("/admin/login");
         return;
@@ -59,7 +67,7 @@ const AdminCourses = () => {
     setEditCourse({ ...editCourse, [e.target.name]: e.target.value });
 
   const handleAddCourse = async () => {
-    const token = localStorage.getItem("adminToken"); // <-- FIXED
+    const token = localStorage.getItem("adminToken");
     if (!token) {
       navigate("/admin/login");
       return;
@@ -86,7 +94,7 @@ const AdminCourses = () => {
   };
 
   const handleEditCourse = async () => {
-    const token = localStorage.getItem("adminToken"); // <-- FIXED
+    const token = localStorage.getItem("adminToken");
     if (!token) {
       navigate("/admin/login");
       return;
@@ -118,7 +126,7 @@ const AdminCourses = () => {
   };
 
   const handleDeleteCourse = async () => {
-    const token = localStorage.getItem("adminToken"); // <-- FIXED
+    const token = localStorage.getItem("adminToken");
     if (!token) {
       navigate("/admin/login");
       return;
@@ -145,59 +153,94 @@ const AdminCourses = () => {
   return (
     <Container sx={{ py: 5 }}>
       <Typography variant="h4" gutterBottom>
+        <MenuBookIcon sx={{ mr: 1, verticalAlign: "middle" }} />
         Manage Courses
       </Typography>
+      <Paper sx={{ p: 2, mb: 3, boxShadow: 2 }}>
+        <Typography variant="body1" color="text.secondary">
+          Add, edit, or delete training courses. See how many students are
+          enrolled in each course.
+        </Typography>
+      </Paper>
       <Button
         variant="contained"
         color="primary"
+        startIcon={<AddCircleIcon />}
         sx={{ mb: 3 }}
         onClick={() => setOpen(true)}
       >
         Add New Course
       </Button>
-      <Table>
+      <Table sx={{ background: "#fff", borderRadius: 2, boxShadow: 1 }}>
         <TableHead>
           <TableRow>
-            <TableCell>Name</TableCell>
+            <TableCell>
+              <MenuBookIcon fontSize="small" /> Name
+            </TableCell>
             <TableCell>Description</TableCell>
-            <TableCell>Enrolled Students</TableCell> {/* NEW COLUMN */}
+            <TableCell>
+              <GroupIcon fontSize="small" /> Enrolled Students
+            </TableCell>
             <TableCell>Actions</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {courses.map((course) => (
-            <TableRow key={course.id}>
-              <TableCell>{course.name}</TableCell>
-              <TableCell>{course.description}</TableCell>
-              <TableCell>{course.enrolled_count || 0}</TableCell>{" "}
-              {/* SHOW COUNT */}
-              <TableCell>
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  size="small"
-                  sx={{ mr: 1 }}
-                  onClick={() => {
-                    setEditCourse(course);
-                    setEditOpen(true);
-                  }}
-                >
-                  Edit
-                </Button>
-                <Button
-                  variant="contained"
-                  color="error"
-                  size="small"
-                  onClick={() => {
-                    setEditCourse(course);
-                    setConfirmDeleteOpen(true);
-                  }}
-                >
-                  Delete
-                </Button>
+          {courses.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={4} align="center">
+                <Chip label="No courses found." color="warning" />
               </TableCell>
             </TableRow>
-          ))}
+          ) : (
+            courses.map((course) => (
+              <TableRow key={course.id} hover>
+                <TableCell>
+                  <Typography variant="subtitle1" fontWeight={500}>
+                    {course.name}
+                  </Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="body2" color="text.secondary">
+                    {course.description}
+                  </Typography>
+                </TableCell>
+                <TableCell>
+                  <Chip
+                    label={course.enrolled_count || 0}
+                    color={course.enrolled_count > 0 ? "success" : "default"}
+                    size="small"
+                  />
+                </TableCell>
+                <TableCell>
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    size="small"
+                    startIcon={<EditIcon />}
+                    sx={{ mr: 1 }}
+                    onClick={() => {
+                      setEditCourse(course);
+                      setEditOpen(true);
+                    }}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="error"
+                    size="small"
+                    startIcon={<DeleteIcon />}
+                    onClick={() => {
+                      setEditCourse(course);
+                      setConfirmDeleteOpen(true);
+                    }}
+                  >
+                    Delete
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
         </TableBody>
       </Table>
 
@@ -259,6 +302,7 @@ const AdminCourses = () => {
             onClick={handleEditCourse}
             variant="contained"
             color="primary"
+            startIcon={<EditIcon />}
           >
             Save
           </Button>
@@ -266,6 +310,7 @@ const AdminCourses = () => {
             onClick={() => setConfirmDeleteOpen(true)}
             variant="contained"
             color="error"
+            startIcon={<DeleteIcon />}
           >
             Delete
           </Button>
@@ -290,6 +335,7 @@ const AdminCourses = () => {
             onClick={handleDeleteCourse}
             variant="contained"
             color="error"
+            startIcon={<DeleteIcon />}
           >
             Yes, Delete
           </Button>

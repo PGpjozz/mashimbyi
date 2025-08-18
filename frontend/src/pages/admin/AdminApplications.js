@@ -8,9 +8,19 @@ import {
   TableCell,
   TableBody,
   Button,
-  Link,
+  Paper,
+  Box,
+  Chip,
+  Tooltip,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import PersonIcon from "@mui/icons-material/Person";
+import EmailIcon from "@mui/icons-material/Email";
+import PhoneIcon from "@mui/icons-material/Phone";
+import SchoolIcon from "@mui/icons-material/School";
+import DescriptionIcon from "@mui/icons-material/Description";
+import DeleteIcon from "@mui/icons-material/Delete";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 const AdminApplications = () => {
   const [applications, setApplications] = useState([]);
@@ -61,29 +71,53 @@ const AdminApplications = () => {
       }
     );
     if (res.ok) {
-      alert("Application enrolled as student!");
-      // Remove application from the list after enrolling
       setApplications(applications.filter((a) => a.id !== id));
     }
   };
 
-  if (error) return <div style={{ color: "red", padding: 20 }}>{error}</div>;
+  if (error)
+    return (
+      <Box sx={{ color: "red", p: 3, textAlign: "center" }}>
+        <Typography variant="h6">{error}</Typography>
+      </Box>
+    );
 
   return (
     <Container sx={{ py: 5 }}>
       <Typography variant="h4" gutterBottom>
+        <PersonIcon sx={{ mr: 1, verticalAlign: "middle" }} />
         Manage Applications
       </Typography>
-      <Table>
+      <Paper sx={{ p: 2, mb: 3, boxShadow: 2 }}>
+        <Typography variant="body1" color="text.secondary">
+          Review, enroll, or delete training applications. Click document links
+          to view files.
+        </Typography>
+      </Paper>
+      <Table sx={{ background: "#fff", borderRadius: 2, boxShadow: 1 }}>
         <TableHead>
           <TableRow>
-            <TableCell>Full Name</TableCell>
-            <TableCell>Email</TableCell>
-            <TableCell>Phone</TableCell>
-            <TableCell>Course</TableCell>
-            <TableCell>CV</TableCell>
-            <TableCell>ID</TableCell>
-            <TableCell>Qualification</TableCell>
+            <TableCell>
+              <PersonIcon fontSize="small" /> Full Name
+            </TableCell>
+            <TableCell>
+              <EmailIcon fontSize="small" /> Email
+            </TableCell>
+            <TableCell>
+              <PhoneIcon fontSize="small" /> Phone
+            </TableCell>
+            <TableCell>
+              <SchoolIcon fontSize="small" /> Course
+            </TableCell>
+            <TableCell>
+              <DescriptionIcon fontSize="small" /> CV
+            </TableCell>
+            <TableCell>
+              <DescriptionIcon fontSize="small" /> ID
+            </TableCell>
+            <TableCell>
+              <DescriptionIcon fontSize="small" /> Qualification
+            </TableCell>
             <TableCell>Actions</TableCell>
           </TableRow>
         </TableHead>
@@ -91,73 +125,102 @@ const AdminApplications = () => {
           {applications.length === 0 ? (
             <TableRow>
               <TableCell colSpan={8} align="center">
-                No applications found.
+                <Chip label="No applications found." color="warning" />
               </TableCell>
             </TableRow>
           ) : (
             applications.map((app) => (
-              <TableRow key={app.id}>
-                <TableCell>{`${app.first_name} ${app.middle_name} ${app.surname}`}</TableCell>
-                <TableCell>{app.email}</TableCell>
-                <TableCell>{app.phone}</TableCell>
-                <TableCell>{app.course_name || app.course}</TableCell>
+              <TableRow key={app.id} hover>
+                <TableCell>
+                  <Tooltip title="Applicant Name">
+                    <span>
+                      {`${app.first_name} ${app.middle_name} ${app.surname}`}
+                    </span>
+                  </Tooltip>
+                </TableCell>
+                <TableCell>
+                  <Tooltip title="Email">
+                    <span>{app.email}</span>
+                  </Tooltip>
+                </TableCell>
+                <TableCell>
+                  <Tooltip title="Phone">
+                    <span>{app.phone}</span>
+                  </Tooltip>
+                </TableCell>
+                <TableCell>
+                  <Chip
+                    label={app.course_name || app.course}
+                    color="primary"
+                    size="small"
+                  />
+                </TableCell>
                 <TableCell>
                   {app.cv ? (
                     <a
-                      href={app.cv} // use as-is, don’t prepend localhost:8000
+                      href={app.cv}
                       target="_blank"
                       rel="noopener noreferrer"
+                      style={{ textDecoration: "none", color: "#1976d2" }}
                     >
                       View CV
                     </a>
                   ) : (
-                    "-"
+                    <Chip label="-" size="small" />
                   )}
                 </TableCell>
                 <TableCell>
                   {app.id_doc ? (
                     <a
-                      href={app.id_doc} // use as-is, don’t prepend localhost:8000
+                      href={app.id_doc}
                       target="_blank"
                       rel="noopener noreferrer"
+                      style={{ textDecoration: "none", color: "#1976d2" }}
                     >
-                      View ID Document
+                      View ID
                     </a>
                   ) : (
-                    "-"
+                    <Chip label="-" size="small" />
                   )}
                 </TableCell>
                 <TableCell>
                   {app.qualification_doc ? (
                     <a
-                      href={app.qualification_doc} // use as-is, don’t prepend localhost:8000
+                      href={app.qualification_doc}
                       target="_blank"
                       rel="noopener noreferrer"
+                      style={{ textDecoration: "none", color: "#1976d2" }}
                     >
-                      View Qualification Document
+                      View Qualification
                     </a>
                   ) : (
-                    "-"
+                    <Chip label="-" size="small" />
                   )}
                 </TableCell>
                 <TableCell>
-                  <Button
-                    variant="contained"
-                    color="success"
-                    size="small"
-                    onClick={() => handleEnroll(app.id)}
-                  >
-                    Enroll
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="error"
-                    size="small"
-                    onClick={() => handleDelete(app.id)}
-                    sx={{ ml: 1 }}
-                  >
-                    Delete
-                  </Button>
+                  <Tooltip title="Enroll as Student">
+                    <Button
+                      variant="contained"
+                      color="success"
+                      size="small"
+                      startIcon={<CheckCircleIcon />}
+                      onClick={() => handleEnroll(app.id)}
+                      sx={{ mr: 1 }}
+                    >
+                      Enroll
+                    </Button>
+                  </Tooltip>
+                  <Tooltip title="Delete Application">
+                    <Button
+                      variant="contained"
+                      color="error"
+                      size="small"
+                      startIcon={<DeleteIcon />}
+                      onClick={() => handleDelete(app.id)}
+                    >
+                      Delete
+                    </Button>
+                  </Tooltip>
                 </TableCell>
               </TableRow>
             ))
