@@ -30,8 +30,8 @@ const Application = () => {
     gender: "",
     email: "",
     phone: "",
-    id_number: "", // <-- NEW FIELD
-    course: "", // <-- change from program to course
+    id_number: "",
+    course: "",
     qualification: "",
     motivation: "",
     qualification_doc: null,
@@ -86,8 +86,8 @@ const Application = () => {
           gender: "",
           email: "",
           phone: "",
-          id_number: "", // <-- RESET FIELD
-          course: "", // <-- change from program to course
+          id_number: "",
+          course: "",
           qualification: "",
           motivation: "",
           qualification_doc: null,
@@ -107,8 +107,22 @@ const Application = () => {
   };
 
   return (
-    <Container sx={{ py: 5 }}>
-      <Typography variant="h3" gutterBottom>
+    <Container
+      sx={{
+        py: 5,
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <Typography
+        variant="h3"
+        gutterBottom
+        align="center"
+        sx={{ fontWeight: "bold", mb: 4 }}
+      >
         Training Application
       </Typography>
 
@@ -117,11 +131,15 @@ const Application = () => {
         onSubmit={handleSubmit}
         sx={{
           maxWidth: 500,
+          width: "100%",
           mx: "auto",
           p: 3,
           background: "#fff",
           borderRadius: 2,
           boxShadow: 2,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
         }}
         encType="multipart/form-data"
       >
@@ -133,6 +151,7 @@ const Application = () => {
           fullWidth
           required
           sx={{ mb: 2 }}
+          InputProps={{ style: { textAlign: "center" } }}
         />
         <TextField
           label="Middle Name"
@@ -141,6 +160,7 @@ const Application = () => {
           onChange={handleChange}
           fullWidth
           sx={{ mb: 2 }}
+          InputProps={{ style: { textAlign: "center" } }}
         />
         <TextField
           label="Last Name"
@@ -150,6 +170,7 @@ const Application = () => {
           fullWidth
           required
           sx={{ mb: 2 }}
+          InputProps={{ style: { textAlign: "center" } }}
         />
 
         <TextField
@@ -161,6 +182,7 @@ const Application = () => {
           fullWidth
           required
           sx={{ mb: 2 }}
+          InputProps={{ style: { textAlign: "center" } }}
         >
           {genders.map((g) => (
             <MenuItem key={g} value={g}>
@@ -178,6 +200,7 @@ const Application = () => {
           fullWidth
           required
           sx={{ mb: 2 }}
+          InputProps={{ style: { textAlign: "center" } }}
         />
         <TextField
           label="Phone"
@@ -187,6 +210,7 @@ const Application = () => {
           fullWidth
           required
           sx={{ mb: 2 }}
+          InputProps={{ style: { textAlign: "center" } }}
         />
         <TextField
           label="ID Number"
@@ -196,19 +220,24 @@ const Application = () => {
           fullWidth
           required
           sx={{ mb: 2 }}
-          inputProps={{ maxLength: 13, pattern: "\\d{13}" }} // only digits, max 13
+          inputProps={{
+            maxLength: 13,
+            pattern: "\\d{13}",
+            style: { textAlign: "center" },
+          }}
           helperText="ID number must be exactly 13 digits"
         />
 
         <TextField
           select
           label="Select Course"
-          name="course" // <-- change from program to course
+          name="course"
           value={form.course}
           onChange={handleChange}
           fullWidth
           required
           sx={{ mb: 2 }}
+          InputProps={{ style: { textAlign: "center" } }}
         >
           {courses.map((c) => (
             <MenuItem key={c.id} value={c.id}>
@@ -226,6 +255,7 @@ const Application = () => {
           fullWidth
           required
           sx={{ mb: 2 }}
+          InputProps={{ style: { textAlign: "center" } }}
         >
           {qualifications.map((q) => (
             <MenuItem key={q} value={q}>
@@ -234,7 +264,7 @@ const Application = () => {
           ))}
         </TextField>
 
-        <InputLabel htmlFor="qualification_doc">
+        <InputLabel htmlFor="qualification_doc" sx={{ alignSelf: "center" }}>
           Upload Qualification
         </InputLabel>
         <input
@@ -243,30 +273,34 @@ const Application = () => {
           name="qualification_doc"
           accept=".pdf,.jpg,.jpeg,.png"
           onChange={handleChange}
-          style={{ marginBottom: 16, width: "100%" }}
-          required // <-- REQUIRED
+          style={{ marginBottom: 16, width: "100%", textAlign: "center" }}
+          required
         />
 
-        <InputLabel htmlFor="id_doc">Upload ID</InputLabel>
+        <InputLabel htmlFor="id_doc" sx={{ alignSelf: "center" }}>
+          Upload ID
+        </InputLabel>
         <input
           type="file"
           id="id_doc"
           name="id_doc"
           accept=".pdf,.jpg,.jpeg,.png"
           onChange={handleChange}
-          style={{ marginBottom: 16, width: "100%" }}
-          required // <-- REQUIRED
+          style={{ marginBottom: 16, width: "100%", textAlign: "center" }}
+          required
         />
 
-        <InputLabel htmlFor="cv">Upload CV</InputLabel>
+        <InputLabel htmlFor="cv" sx={{ alignSelf: "center" }}>
+          Upload CV
+        </InputLabel>
         <input
           type="file"
           id="cv"
           name="cv"
           accept=".pdf,.doc,.docx"
           onChange={handleChange}
-          style={{ marginBottom: 16, width: "100%" }}
-          required // <-- REQUIRED
+          style={{ marginBottom: 16, width: "100%", textAlign: "center" }}
+          required
         />
 
         <TextField
@@ -278,9 +312,16 @@ const Application = () => {
           multiline
           rows={4}
           sx={{ mb: 2 }}
+          InputProps={{ style: { textAlign: "center" } }}
         />
 
-        <Button type="submit" variant="contained" color="primary" fullWidth>
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          fullWidth
+          sx={{ mt: 2 }}
+        >
           Submit Application
         </Button>
       </Box>
@@ -289,6 +330,7 @@ const Application = () => {
         open={open}
         autoHideDuration={4000}
         onClose={() => setOpen(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
         <Alert
           onClose={() => setOpen(false)}

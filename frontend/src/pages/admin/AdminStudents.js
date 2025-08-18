@@ -16,6 +16,9 @@ import {
   Paper,
   Chip,
   Box,
+  InputAdornment,
+  MenuItem,
+  IconButton,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import PersonIcon from "@mui/icons-material/Person";
@@ -24,6 +27,9 @@ import BadgeIcon from "@mui/icons-material/Badge";
 import SchoolIcon from "@mui/icons-material/School";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import SearchIcon from "@mui/icons-material/Search";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 
 const AdminStudents = () => {
   const [students, setStudents] = useState([]);
@@ -31,6 +37,11 @@ const AdminStudents = () => {
   const [open, setOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
+  const [filterCourse, setFilterCourse] = useState("");
+  const [sortField, setSortField] = useState("first_name");
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [courses, setCourses] = useState([]);
   const token = localStorage.getItem("adminToken");
   const navigate = useNavigate();
 
@@ -55,7 +66,19 @@ const AdminStudents = () => {
         setError("Failed to load students.");
       }
     };
+    const fetchCourses = async () => {
+      try {
+        const res = await fetch("http://localhost:8000/api/courses/", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        setCourses(Array.isArray(data) ? data : data.results || []);
+      } catch {
+        setCourses([]);
+      }
+    };
     fetchStudents();
+    fetchCourses();
   }, [token, navigate]);
 
   const handleView = (student) => {
@@ -109,6 +132,35 @@ const AdminStudents = () => {
     }
   };
 
+  // --- Search, Sort, Filter Logic ---
+  const filteredStudents = students
+    .filter((student) => {
+      // Search by name, email, id_number
+      const searchText = search.toLowerCase();
+      const matchesSearch =
+        student.first_name?.toLowerCase().includes(searchText) ||
+        student.last_name?.toLowerCase().includes(searchText) ||
+        student.email?.toLowerCase().includes(searchText) ||
+        student.id_number?.toLowerCase().includes(searchText);
+      // Filter by course
+      const matchesCourse =
+        !filterCourse ||
+        (student.enrolled_courses &&
+          student.enrolled_courses.includes(
+            courses.find((c) => c.id === filterCourse)?.name
+          ));
+      return matchesSearch && matchesCourse;
+    })
+    .sort((a, b) => {
+      let valA = a[sortField] || "";
+      let valB = b[sortField] || "";
+      if (typeof valA === "string") valA = valA.toLowerCase();
+      if (typeof valB === "string") valB = valB.toLowerCase();
+      if (valA < valB) return sortOrder === "asc" ? -1 : 1;
+      if (valA > valB) return sortOrder === "asc" ? 1 : -1;
+      return 0;
+    });
+
   if (error)
     return (
       <Box sx={{ color: "red", p: 3, textAlign: "center" }}>
@@ -124,10 +176,70 @@ const AdminStudents = () => {
       </Typography>
       <Paper sx={{ p: 2, mb: 3, boxShadow: 2 }}>
         <Typography variant="body1" color="text.secondary">
-          View, edit, or dismiss enrolled students. Click document links to view
-          files.
+          View, search, sort, filter, edit, or dismiss enrolled students. Click
+          document links to view files.
         </Typography>
       </Paper>
+      <Box
+        sx={{
+          display: "flex",
+          gap: 2,
+          mb: 2,
+          flexWrap: "wrap",
+          alignItems: "center",
+        }}
+      >
+        <TextField
+          label="Search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          size="small"
+          sx={{ minWidth: 200 }}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+          }}
+        />
+        <TextField
+          select
+          label="Filter by Course"
+          value={filterCourse}
+          onChange={(e) => setFilterCourse(e.target.value)}
+          size="small"
+          sx={{ minWidth: 200 }}
+        >
+          <MenuItem value="">All Courses</MenuItem>
+          {courses.map((course) => (
+            <MenuItem key={course.id} value={course.id}>
+              {course.name}
+            </MenuItem>
+          ))}
+        </TextField>
+        <TextField
+          select
+          label="Sort by"
+          value={sortField}
+          onChange={(e) => setSortField(e.target.value)}
+          size="small"
+          sx={{ minWidth: 150 }}
+        >
+          <MenuItem value="first_name">First Name</MenuItem>
+          <MenuItem value="last_name">Last Name</MenuItem>
+          <MenuItem value="email">Email</MenuItem>
+          <MenuItem value="id_number">ID Number</MenuItem>
+        </TextField>
+        <IconButton
+          onClick={() =>
+            setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"))
+          }
+          color="primary"
+        >
+          {sortOrder === "asc" ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
+        </IconButton>
+      </Box>
       <Table sx={{ background: "#fff", borderRadius: 2, boxShadow: 1 }}>
         <TableHead>
           <TableRow>
@@ -150,14 +262,14 @@ const AdminStudents = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {students.length === 0 ? (
+          {filteredStudents.length === 0 ? (
             <TableRow>
               <TableCell colSpan={6} align="center">
                 <Chip label="No students found." color="warning" />
               </TableCell>
             </TableRow>
           ) : (
-            students.map((student) => (
+            filteredStudents.map((student) => (
               <TableRow key={student.id} hover>
                 <TableCell>
                   <Chip
