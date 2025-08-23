@@ -52,9 +52,12 @@ const AdminStudents = () => {
 
     const fetchStudents = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/students/", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetch(
+          "https://sogwa-81485d33beca.herokuapp.com/api/students/",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         if (res.status === 401) {
           setError("Unauthorized: Please login as admin.");
           return navigate("/admin/login");
@@ -68,9 +71,12 @@ const AdminStudents = () => {
 
     const fetchCourses = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/courses/", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetch(
+          "https://sogwa-81485d33beca.herokuapp.com/api/courses/",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         const data = await res.json();
         setCourses(Array.isArray(data) ? data : data.results || []);
       } catch {
@@ -94,7 +100,7 @@ const AdminStudents = () => {
   const handleSave = async () => {
     const { qualification_file, id_file, cv_file, ...fields } = selectedStudent;
     const res = await fetch(
-      `http://localhost:8000/api/students/${selectedStudent.id}/`,
+      `https://sogwa-81485d33beca.herokuapp.com/api/students/${selectedStudent.id}/`,
       {
         method: "PATCH",
         headers: {
@@ -116,7 +122,7 @@ const AdminStudents = () => {
 
   const handleDelete = async () => {
     const res = await fetch(
-      `http://localhost:8000/api/students/${selectedStudent.id}/`,
+      `https://sogwa-81485d33beca.herokuapp.com/api/students/${selectedStudent.id}/`,
       {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },

@@ -37,13 +37,13 @@ const AdminDashboard = () => {
     const fetchStats = async () => {
       try {
         const [appsRes, studentsRes, coursesRes] = await Promise.all([
-          fetch("http://localhost:8000/api/applications/", {
+          fetch("https://sogwa-81485d33beca.herokuapp.com/api/applications/", {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          fetch("http://localhost:8000/api/students/", {
+          fetch("https://sogwa-81485d33beca.herokuapp.com/api/students/", {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          fetch("http://localhost:8000/api/courses/", {
+          fetch("https://sogwa-81485d33beca.herokuapp.com/api/courses/", {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);

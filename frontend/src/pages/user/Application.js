@@ -86,9 +86,12 @@ const Application = () => {
     const controller = new AbortController();
     const fetchCourses = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/public-courses/", {
-          signal: controller.signal,
-        });
+        const res = await fetch(
+          "https://sogwa-81485d33beca.herokuapp.com/api/public-courses/",
+          {
+            signal: controller.signal,
+          }
+        );
         const data = await res.json();
         setCourses(Array.isArray(data) ? data : data.results || []);
       } catch {
@@ -115,10 +118,13 @@ const Application = () => {
     });
 
     try {
-      const res = await fetch("http://localhost:8000/api/application/", {
-        method: "POST",
-        body: formData,
-      });
+      const res = await fetch(
+        "https://sogwa-81485d33beca.herokuapp.com/api/application/",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
       const data = await res.json();
 
       if (!res.ok) {

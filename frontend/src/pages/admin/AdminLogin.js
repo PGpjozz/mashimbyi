@@ -30,17 +30,23 @@ const AdminLogin = () => {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:8000/api/token/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
+      const res = await fetch(
+        "https://sogwa-81485d33beca.herokuapp.com/api/token/",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form),
+        }
+      );
       const data = await res.json();
 
       if (res.ok && data.access) {
-        const userRes = await fetch("http://localhost:8000/api/user/", {
-          headers: { Authorization: `Bearer ${data.access}` },
-        });
+        const userRes = await fetch(
+          "https://sogwa-81485d33beca.herokuapp.com/api/user/",
+          {
+            headers: { Authorization: `Bearer ${data.access}` },
+          }
+        );
         const user = await userRes.json();
 
         if (user.is_superuser) {

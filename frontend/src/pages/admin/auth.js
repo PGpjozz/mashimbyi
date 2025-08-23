@@ -3,11 +3,14 @@ export const refreshToken = async () => {
   const refresh = localStorage.getItem("refreshToken");
   if (!refresh) return null;
 
-  const res = await fetch("http://localhost:8000/api/token/refresh/", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ refresh }),
-  });
+  const res = await fetch(
+    "https://sogwa-81485d33beca.herokuapp.com/api/token/refresh/",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refresh }),
+    }
+  );
 
   if (res.ok) {
     const data = await res.json();

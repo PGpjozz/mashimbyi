@@ -54,9 +54,12 @@ const AdminApplications = () => {
     const fetchApplications = async () => {
       setLoading(true);
       try {
-        const res = await fetch("http://localhost:8000/api/applications/", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetch(
+          "https://sogwa-81485d33beca.herokuapp.com/api/applications/",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         if (res.status === 401) {
           setError("Unauthorized: Please login as admin.");
           return navigate("/admin/login");
@@ -71,9 +74,12 @@ const AdminApplications = () => {
 
     const fetchCourses = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/courses/", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetch(
+          "https://sogwa-81485d33beca.herokuapp.com/api/courses/",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         const data = await res.json();
         setCourses(Array.isArray(data) ? data : data.results || []);
       } catch {
@@ -88,10 +94,13 @@ const AdminApplications = () => {
   const handleDelete = async (id) => {
     setConfirmOpen(false);
     setLoading(true);
-    const res = await fetch(`http://localhost:8000/api/applications/${id}/`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const res = await fetch(
+      `https://sogwa-81485d33beca.herokuapp.com/api/applications/${id}/`,
+      {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
     if (res.ok) setApplications(applications.filter((a) => a.id !== id));
     setLoading(false);
   };
@@ -99,7 +108,7 @@ const AdminApplications = () => {
   const handleEnroll = async (id) => {
     setLoading(true);
     const res = await fetch(
-      `http://localhost:8000/api/applications/${id}/enroll/`,
+      `https://sogwa-81485d33beca.herokuapp.com/api/applications/${id}/enroll/`,
       { method: "POST", headers: { Authorization: `Bearer ${token}` } }
     );
     if (res.ok) setApplications(applications.filter((a) => a.id !== id));

@@ -45,7 +45,7 @@ const AdminCourses = () => {
   const [sortOrder, setSortOrder] = useState("asc");
   const navigate = useNavigate();
 
-  const API_URL = "http://localhost:8000/api/courses/";
+  const API_URL = "https://sogwa-81485d33beca.herokuapp.com/api/courses/";
 
   useEffect(() => {
     const fetchCourses = async () => {

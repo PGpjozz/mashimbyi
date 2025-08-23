@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:8000/api", // Change to Render backend URL on deploy
+  baseURL: "https://sogwa-81485d33beca.herokuapp.com/api", // Change to heroku backend URL on deploy
 });
 
 export const fetchCourses = () => API.get("/courses/");
