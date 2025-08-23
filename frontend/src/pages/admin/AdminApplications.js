@@ -156,9 +156,9 @@ const AdminApplications = () => {
                   />
                 </TableCell>
                 <TableCell>
-                  {app.cv ? (
+                  {app.cv_url ? (
                     <a
-                      href={app.cv}
+                      href={app.cv_url}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{ textDecoration: "none", color: "#1976d2" }}
@@ -170,9 +170,9 @@ const AdminApplications = () => {
                   )}
                 </TableCell>
                 <TableCell>
-                  {app.id_doc ? (
+                  {app.id_doc_url ? (
                     <a
-                      href={app.id_doc}
+                      href={app.id_doc_url}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{ textDecoration: "none", color: "#1976d2" }}
@@ -184,9 +184,9 @@ const AdminApplications = () => {
                   )}
                 </TableCell>
                 <TableCell>
-                  {app.qualification_doc ? (
+                  {app.qualification_doc_url ? (
                     <a
-                      href={app.qualification_doc}
+                      href={app.qualification_doc_url}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{ textDecoration: "none", color: "#1976d2" }}

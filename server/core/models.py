@@ -1,4 +1,5 @@
 from django.db import models
+from storages.backends.s3boto3 import S3Boto3Storage
 
 QUALIFICATIONS = [
     ("Grade 11", "Grade 11"),
@@ -34,9 +35,10 @@ class Application(models.Model):
     motivation = models.TextField()
     id_number = models.CharField(max_length=13)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    qualification_doc = models.FileField(upload_to="qualifications/")
-    id_doc = models.FileField(upload_to="ids/")
-    cv = models.FileField(upload_to="cvs/")
+    qualification_doc = models.FileField(upload_to="qualifications/", storage=S3Boto3Storage())
+    id_doc = models.FileField(upload_to="ids/", storage=S3Boto3Storage())
+    cv = models.FileField(upload_to="cvs/", storage=S3Boto3Storage())
+
     submitted_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -51,9 +53,8 @@ class Student(models.Model):
     id_number = models.CharField(max_length=13)
     enrolled_courses = models.ManyToManyField(Course, related_name="students")
     qualification_file = models.FileField(upload_to="qualifications/", blank=True, null=True)
-    id_file = models.FileField(upload_to="ids/", blank=True, null=True)
-    cv_file = models.FileField(upload_to="cvs/", blank=True, null=True)
-    student_number = models.CharField(max_length=20, blank=True)
-
+    qualification_file = models.FileField(upload_to="qualifications/", storage=S3Boto3Storage(), blank=True, null=True)
+    id_file = models.FileField(upload_to="ids/", storage=S3Boto3Storage(), blank=True, null=True)
+    cv_file = models.FileField(upload_to="cvs/", storage=S3Boto3Storage(), blank=True, null=True)
     def __str__(self):
         return f"{self.first_name} {self.last_name}"

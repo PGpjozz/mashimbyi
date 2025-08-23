@@ -375,9 +375,9 @@ const AdminStudents = () => {
           </Typography>
           <div>
             <strong>Qualification:</strong>{" "}
-            {selectedStudent?.qualification_file ? (
+            {selectedStudent?.qualification_file_url ? (
               <a
-                href={selectedStudent.qualification_file}
+                href={selectedStudent.qualification_file_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ textDecoration: "none", color: "#1976d2" }}
@@ -392,9 +392,9 @@ const AdminStudents = () => {
           </div>
           <div>
             <strong>ID:</strong>{" "}
-            {selectedStudent?.id_file ? (
+            {selectedStudent?.id_file_url ? (
               <a
-                href={selectedStudent.id_file}
+                href={selectedStudent.id_file_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ textDecoration: "none", color: "#1976d2" }}
@@ -409,9 +409,9 @@ const AdminStudents = () => {
           </div>
           <div>
             <strong>CV:</strong>{" "}
-            {selectedStudent?.cv_file ? (
+            {selectedStudent?.cv_file_url ? (
               <a
-                href={selectedStudent.cv_file}
+                href={selectedStudent.cv_file_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ textDecoration: "none", color: "#1976d2" }}
