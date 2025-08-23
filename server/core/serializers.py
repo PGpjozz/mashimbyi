@@ -21,6 +21,13 @@ class ApplicationSerializer(serializers.ModelSerializer):
         model = Application
         fields = "__all__"
         extra_fields = ["course_name", "cv_url", "id_doc_url", "qualification_doc_url"]
+        extra_kwargs = {
+            "middle_name": {"required": False, "allow_null": True, "allow_blank": True},
+            "cv": {"required": False, "allow_null": True},
+            "qualification_doc": {"required": False, "allow_null": True},
+            "motivation": {"required": False, "allow_null": True, "allow_blank": True},
+            "highest_qualification": {"required": False, "allow_null": True, "allow_blank": True},
+        }
 
     def get_presigned_url(self, file_field):
         if not file_field:

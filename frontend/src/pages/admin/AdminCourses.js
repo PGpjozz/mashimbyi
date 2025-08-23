@@ -16,6 +16,10 @@ import {
   Paper,
   Box,
   Chip,
+  CircularProgress,
+  InputAdornment,
+  IconButton,
+  MenuItem,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
@@ -23,6 +27,9 @@ import GroupIcon from "@mui/icons-material/Group";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import SearchIcon from "@mui/icons-material/Search";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 
 const AdminCourses = () => {
   const [courses, setCourses] = useState([]);
@@ -32,6 +39,10 @@ const AdminCourses = () => {
   const [editCourse, setEditCourse] = useState(null);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [sortField, setSortField] = useState("name");
+  const [sortOrder, setSortOrder] = useState("asc");
   const navigate = useNavigate();
 
   const API_URL = "http://localhost:8000/api/courses/";
@@ -43,6 +54,7 @@ const AdminCourses = () => {
         navigate("/admin/login");
         return;
       }
+      setLoading(true);
       try {
         const res = await fetch(API_URL, {
           headers: { Authorization: `Bearer ${token}` },
@@ -57,6 +69,7 @@ const AdminCourses = () => {
       } catch {
         setError("Failed to load courses.");
       }
+      setLoading(false);
     };
     fetchCourses();
   }, [navigate]);
@@ -72,6 +85,7 @@ const AdminCourses = () => {
       navigate("/admin/login");
       return;
     }
+    setLoading(true);
     const res = await fetch(API_URL, {
       method: "POST",
       headers: {
@@ -83,6 +97,7 @@ const AdminCourses = () => {
     if (res.status === 401) {
       setError("Unauthorized: Please login as admin.");
       navigate("/admin/login");
+      setLoading(false);
       return;
     }
     if (res.ok) {
@@ -91,6 +106,7 @@ const AdminCourses = () => {
       setOpen(false);
       setNewCourse({ name: "", description: "" });
     }
+    setLoading(false);
   };
 
   const handleEditCourse = async () => {
@@ -99,6 +115,7 @@ const AdminCourses = () => {
       navigate("/admin/login");
       return;
     }
+    setLoading(true);
     const res = await fetch(`${API_URL}${editCourse.id}/`, {
       method: "PATCH",
       headers: {
@@ -113,6 +130,7 @@ const AdminCourses = () => {
     if (res.status === 401) {
       setError("Unauthorized: Please login as admin.");
       navigate("/admin/login");
+      setLoading(false);
       return;
     }
     if (res.ok) {
@@ -123,6 +141,7 @@ const AdminCourses = () => {
       setEditOpen(false);
       setEditCourse(null);
     }
+    setLoading(false);
   };
 
   const handleDeleteCourse = async () => {
@@ -131,6 +150,7 @@ const AdminCourses = () => {
       navigate("/admin/login");
       return;
     }
+    setLoading(true);
     const res = await fetch(`${API_URL}${editCourse.id}/`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
@@ -138,6 +158,7 @@ const AdminCourses = () => {
     if (res.status === 401) {
       setError("Unauthorized: Please login as admin.");
       navigate("/admin/login");
+      setLoading(false);
       return;
     }
     if (res.ok) {
@@ -146,7 +167,27 @@ const AdminCourses = () => {
       setEditCourse(null);
       setConfirmDeleteOpen(false);
     }
+    setLoading(false);
   };
+
+  // --- Search & Sort Logic ---
+  const filteredCourses = courses
+    .filter((course) => {
+      const searchText = search.toLowerCase();
+      return (
+        course.name?.toLowerCase().includes(searchText) ||
+        course.description?.toLowerCase().includes(searchText)
+      );
+    })
+    .sort((a, b) => {
+      let valA = a[sortField] || "";
+      let valB = b[sortField] || "";
+      if (typeof valA === "string") valA = valA.toLowerCase();
+      if (typeof valB === "string") valB = valB.toLowerCase();
+      if (valA < valB) return sortOrder === "asc" ? -1 : 1;
+      if (valA > valB) return sortOrder === "asc" ? 1 : -1;
+      return 0;
+    });
 
   if (error) return <div style={{ color: "red", padding: 20 }}>{error}</div>;
 
@@ -156,12 +197,6 @@ const AdminCourses = () => {
         <MenuBookIcon sx={{ mr: 1, verticalAlign: "middle" }} />
         Manage Courses
       </Typography>
-      <Paper sx={{ p: 2, mb: 3, boxShadow: 2 }}>
-        <Typography variant="body1" color="text.secondary">
-          Add, edit, or delete training courses. See how many students are
-          enrolled in each course.
-        </Typography>
-      </Paper>
       <Button
         variant="contained"
         color="primary"
@@ -171,79 +206,133 @@ const AdminCourses = () => {
       >
         Add New Course
       </Button>
-      <Table sx={{ background: "#fff", borderRadius: 2, boxShadow: 1 }}>
-        <TableHead>
-          <TableRow>
-            <TableCell>
-              <MenuBookIcon fontSize="small" /> Name
-            </TableCell>
-            <TableCell>Description</TableCell>
-            <TableCell>
-              <GroupIcon fontSize="small" /> Enrolled Students
-            </TableCell>
-            <TableCell>Actions</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {courses.length === 0 ? (
+      <Paper sx={{ p: 2, mb: 3, boxShadow: 2 }}>
+        <Typography variant="body1" color="text.secondary">
+          Add, edit, or delete training courses. See how many students are
+          enrolled in each course.
+        </Typography>
+      </Paper>
+      <Box
+        sx={{
+          display: "flex",
+          gap: 2,
+          mb: 2,
+          flexWrap: "wrap",
+          alignItems: "center",
+        }}
+      >
+        <TextField
+          label="Search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          size="small"
+          sx={{ minWidth: 200 }}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+          }}
+        />
+        <TextField
+          select
+          label="Sort by"
+          value={sortField}
+          onChange={(e) => setSortField(e.target.value)}
+          size="small"
+          sx={{ minWidth: 150 }}
+        >
+          <MenuItem value="name">Name</MenuItem>
+          <MenuItem value="description">Description</MenuItem>
+        </TextField>
+        <IconButton
+          onClick={() =>
+            setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"))
+          }
+          color="primary"
+        >
+          {sortOrder === "asc" ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
+        </IconButton>
+      </Box>
+      {loading ? (
+        <Box sx={{ display: "flex", justifyContent: "center", py: 5 }}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        <Table sx={{ background: "#fff", borderRadius: 2, boxShadow: 1 }}>
+          <TableHead>
             <TableRow>
-              <TableCell colSpan={4} align="center">
-                <Chip label="No courses found." color="warning" />
+              <TableCell>
+                <MenuBookIcon fontSize="small" /> Name
               </TableCell>
+              <TableCell>Description</TableCell>
+              <TableCell>
+                <GroupIcon fontSize="small" /> Enrolled Students
+              </TableCell>
+              <TableCell>Actions</TableCell>
             </TableRow>
-          ) : (
-            courses.map((course) => (
-              <TableRow key={course.id} hover>
-                <TableCell>
-                  <Typography variant="subtitle1" fontWeight={500}>
-                    {course.name}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="body2" color="text.secondary">
-                    {course.description}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Chip
-                    label={course.enrolled_count || 0}
-                    color={course.enrolled_count > 0 ? "success" : "default"}
-                    size="small"
-                  />
-                </TableCell>
-                <TableCell>
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    size="small"
-                    startIcon={<EditIcon />}
-                    sx={{ mr: 1 }}
-                    onClick={() => {
-                      setEditCourse(course);
-                      setEditOpen(true);
-                    }}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="error"
-                    size="small"
-                    startIcon={<DeleteIcon />}
-                    onClick={() => {
-                      setEditCourse(course);
-                      setConfirmDeleteOpen(true);
-                    }}
-                  >
-                    Delete
-                  </Button>
+          </TableHead>
+          <TableBody>
+            {filteredCourses.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={4} align="center">
+                  <Chip label="No courses found." color="warning" />
                 </TableCell>
               </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
-
+            ) : (
+              filteredCourses.map((course) => (
+                <TableRow key={course.id} hover>
+                  <TableCell>
+                    <Typography variant="subtitle1" fontWeight={500}>
+                      {course.name}
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="body2" color="text.secondary">
+                      {course.description}
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Chip
+                      label={course.enrolled_count || 0}
+                      color={course.enrolled_count > 0 ? "success" : "default"}
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      size="small"
+                      startIcon={<EditIcon />}
+                      sx={{ mr: 1 }}
+                      onClick={() => {
+                        setEditCourse(course);
+                        setEditOpen(true);
+                      }}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="contained"
+                      color="error"
+                      size="small"
+                      startIcon={<DeleteIcon />}
+                      onClick={() => {
+                        setEditCourse(course);
+                        setConfirmDeleteOpen(true);
+                      }}
+                    >
+                      Delete
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      )}
       {/* Add Course Dialog */}
       <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogTitle>Add New Course</DialogTitle>
@@ -273,7 +362,6 @@ const AdminCourses = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
       {/* Edit Course Dialog */}
       <Dialog open={editOpen} onClose={() => setEditOpen(false)}>
         <DialogTitle>Edit Course</DialogTitle>
@@ -316,7 +404,6 @@ const AdminCourses = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
       {/* Confirm Delete Dialog */}
       <Dialog
         open={confirmDeleteOpen}

@@ -26,19 +26,22 @@ class Course(models.Model):
 
 class Application(models.Model):
     first_name = models.CharField(max_length=100)
-    middle_name = models.CharField(max_length=100, blank=True)
+    middle_name = models.CharField(max_length=100, blank=True, null=True)
     surname = models.CharField(max_length=100)
     gender = models.CharField(max_length=20, choices=GENDERS)
     email = models.EmailField()
     phone = models.CharField(max_length=20)
-    highest_qualification = models.CharField(max_length=50, choices=QUALIFICATIONS)
-    motivation = models.TextField()
+    highest_qualification = models.CharField(max_length=50, choices=QUALIFICATIONS, blank=True, null=True)
+    motivation = models.TextField(blank=True, null=True)
     id_number = models.CharField(max_length=13)
+    
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    qualification_doc = models.FileField(upload_to="qualifications/", storage=S3Boto3Storage())
+    qualification_doc = models.FileField(upload_to="qualifications/", storage=S3Boto3Storage(), blank=True, null=True)
     id_doc = models.FileField(upload_to="ids/", storage=S3Boto3Storage())
-    cv = models.FileField(upload_to="cvs/", storage=S3Boto3Storage())
+    cv = models.FileField(upload_to="cvs/", storage=S3Boto3Storage(), blank=True, null=True)
 
+    enrollment_month = models.CharField(max_length=20, default="September 2025")
+    application_date = models.DateField(auto_now_add=True)
     submitted_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -52,9 +55,9 @@ class Student(models.Model):
     program = models.ForeignKey(Course, on_delete=models.CASCADE)
     id_number = models.CharField(max_length=13)
     enrolled_courses = models.ManyToManyField(Course, related_name="students")
-    qualification_file = models.FileField(upload_to="qualifications/", blank=True, null=True)
     qualification_file = models.FileField(upload_to="qualifications/", storage=S3Boto3Storage(), blank=True, null=True)
     id_file = models.FileField(upload_to="ids/", storage=S3Boto3Storage(), blank=True, null=True)
     cv_file = models.FileField(upload_to="cvs/", storage=S3Boto3Storage(), blank=True, null=True)
+    enrollment_month = models.CharField(max_length=20, blank=True, null=True)
     def __str__(self):
         return f"{self.first_name} {self.last_name}"

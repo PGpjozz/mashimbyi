@@ -7,13 +7,12 @@ import localSetaLogo from "../assets/accreditation/local_seta.jpg";
 import constructionSetaLogo from "../assets/accreditation/construction_seta.jpg";
 import cipcLogo from "../assets/accreditation/cipc.png";
 import qctoLogo from "../assets/accreditation/qcto.png";
-import bidvestLogo from "../assets/accreditation/bidvest.png";
 
 const Footer = () => (
   <Box
     sx={{
-      py: 4,
-      mt: 6,
+      py: { xs: 3, md: 4 },
+      mt: { xs: 4, md: 6 },
       color: "white",
       position: "relative",
       overflow: "hidden",
@@ -25,7 +24,8 @@ const Footer = () => (
         content: '""',
         position: "absolute",
         inset: 0,
-        background: "rgba(25, 118, 210, 0.85)",
+        background:
+          "linear-gradient(120deg, rgba(25,118,210,0.92) 60%, rgba(25,118,210,0.85) 100%)",
         zIndex: 0,
       },
     }}
@@ -38,6 +38,8 @@ const Footer = () => (
             alignItems: "center",
             justifyContent: "center",
             mb: 2,
+            flexWrap: "wrap",
+            gap: 1,
           }}
         >
           <Box
@@ -45,15 +47,22 @@ const Footer = () => (
             src={sogwaLogo}
             alt="Sogwa Solutions Logo"
             sx={{
-              height: 48,
-              width: 48,
+              height: 44,
+              width: 44,
               borderRadius: "50%",
               mr: 2,
               background: "#fff",
               p: 1,
+              boxShadow: 2,
             }}
           />
-          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: "bold",
+              fontSize: { xs: "1.1rem", md: "1.25rem" },
+            }}
+          >
             Sogwa Solutions
           </Typography>
         </Box>
@@ -72,37 +81,33 @@ const Footer = () => (
             display: "flex",
             flexWrap: "wrap",
             justifyContent: "center",
-            gap: 2,
+            gap: { xs: 1, md: 2 },
             mb: 2,
           }}
         >
-          <Box
-            component="img"
-            src={etdpLogo}
-            alt="ETDP SETA"
-            sx={{ height: 32 }}
-          />
-          <Box component="img" src={saqaLogo} alt="SAQA" sx={{ height: 32 }} />
-          <Box
-            component="img"
-            src={localSetaLogo}
-            alt="Local SETA"
-            sx={{ height: 32 }}
-          />
-          <Box
-            component="img"
-            src={constructionSetaLogo}
-            alt="Construction SETA"
-            sx={{ height: 32 }}
-          />
-          <Box component="img" src={cipcLogo} alt="CIPC" sx={{ height: 32 }} />
-          <Box component="img" src={qctoLogo} alt="QCTO" sx={{ height: 32 }} />
-          <Box
-            component="img"
-            src={bidvestLogo}
-            alt="Bidvest"
-            sx={{ height: 32 }}
-          />
+          {[
+            etdpLogo,
+            saqaLogo,
+            localSetaLogo,
+            constructionSetaLogo,
+            cipcLogo,
+            qctoLogo,
+          ].map((logo, i) => (
+            <Box
+              key={i}
+              component="img"
+              src={logo}
+              alt={"Accreditation Logo " + i}
+              sx={{
+                height: { xs: 26, md: 32 },
+                mx: 0.5,
+                background: "#fff",
+                borderRadius: 1,
+                p: 0.5,
+                boxShadow: 1,
+              }}
+            />
+          ))}
         </Box>
         <Typography
           variant="caption"

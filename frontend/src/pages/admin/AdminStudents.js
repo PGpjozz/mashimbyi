@@ -19,6 +19,7 @@ import {
   InputAdornment,
   MenuItem,
   IconButton,
+  CircularProgress,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import PersonIcon from "@mui/icons-material/Person";
@@ -39,6 +40,7 @@ const AdminStudents = () => {
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [filterCourse, setFilterCourse] = useState("");
+  const [filterIntake, setFilterIntake] = useState("");
   const [sortField, setSortField] = useState("first_name");
   const [sortOrder, setSortOrder] = useState("asc");
   const [courses, setCourses] = useState([]);
@@ -46,19 +48,16 @@ const AdminStudents = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (!token) return navigate("/admin/login");
+
     const fetchStudents = async () => {
-      if (!token) {
-        navigate("/admin/login");
-        return;
-      }
       try {
         const res = await fetch("http://localhost:8000/api/students/", {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.status === 401) {
           setError("Unauthorized: Please login as admin.");
-          navigate("/admin/login");
-          return;
+          return navigate("/admin/login");
         }
         const data = await res.json();
         setStudents(Array.isArray(data) ? data : data.results || []);
@@ -66,6 +65,7 @@ const AdminStudents = () => {
         setError("Failed to load students.");
       }
     };
+
     const fetchCourses = async () => {
       try {
         const res = await fetch("http://localhost:8000/api/courses/", {
@@ -77,6 +77,7 @@ const AdminStudents = () => {
         setCourses([]);
       }
     };
+
     fetchStudents();
     fetchCourses();
   }, [token, navigate]);
@@ -87,10 +88,7 @@ const AdminStudents = () => {
   };
 
   const handleChange = (e) => {
-    setSelectedStudent({
-      ...selectedStudent,
-      [e.target.name]: e.target.value,
-    });
+    setSelectedStudent({ ...selectedStudent, [e.target.name]: e.target.value });
   };
 
   const handleSave = async () => {
@@ -113,7 +111,6 @@ const AdminStudents = () => {
     } else {
       const err = await res.text();
       setError("Failed to save student: " + err);
-      return;
     }
   };
 
@@ -132,33 +129,40 @@ const AdminStudents = () => {
     }
   };
 
-  // --- Search, Sort, Filter Logic ---
   const filteredStudents = students
     .filter((student) => {
-      // Search by name, email, id_number
       const searchText = search.toLowerCase();
       const matchesSearch =
         student.first_name?.toLowerCase().includes(searchText) ||
         student.last_name?.toLowerCase().includes(searchText) ||
         student.email?.toLowerCase().includes(searchText) ||
         student.id_number?.toLowerCase().includes(searchText);
-      // Filter by course
       const matchesCourse =
         !filterCourse ||
         (student.enrolled_courses &&
           student.enrolled_courses.includes(
             courses.find((c) => c.id === filterCourse)?.name
           ));
-      return matchesSearch && matchesCourse;
+      const matchesIntake =
+        !filterIntake || student.enrollment_month === filterIntake;
+      return matchesSearch && matchesCourse && matchesIntake;
     })
     .sort((a, b) => {
       let valA = a[sortField] || "";
       let valB = b[sortField] || "";
       if (typeof valA === "string") valA = valA.toLowerCase();
       if (typeof valB === "string") valB = valB.toLowerCase();
-      if (valA < valB) return sortOrder === "asc" ? -1 : 1;
-      if (valA > valB) return sortOrder === "asc" ? 1 : -1;
-      return 0;
+      return sortOrder === "asc"
+        ? valA < valB
+          ? -1
+          : valA > valB
+          ? 1
+          : 0
+        : valA > valB
+        ? -1
+        : valA < valB
+        ? 1
+        : 0;
     });
 
   if (error)
@@ -170,22 +174,25 @@ const AdminStudents = () => {
 
   return (
     <Container sx={{ py: 5 }}>
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold" }}>
         <SchoolIcon sx={{ mr: 1, verticalAlign: "middle" }} />
         Enrolled Students
       </Typography>
-      <Paper sx={{ p: 2, mb: 3, boxShadow: 2 }}>
+
+      <Paper sx={{ p: 3, mb: 4, boxShadow: 3, borderRadius: 2 }}>
         <Typography variant="body1" color="text.secondary">
           View, search, sort, filter, edit, or dismiss enrolled students. Click
           document links to view files.
         </Typography>
       </Paper>
+
+      {/* Search/Filter/Sort */}
       <Box
         sx={{
           display: "flex",
-          gap: 2,
-          mb: 2,
           flexWrap: "wrap",
+          gap: 2,
+          mb: 3,
           alignItems: "center",
         }}
       >
@@ -220,6 +227,23 @@ const AdminStudents = () => {
         </TextField>
         <TextField
           select
+          label="Filter by Intake Month"
+          value={filterIntake}
+          onChange={(e) => setFilterIntake(e.target.value)}
+          size="small"
+          sx={{ minWidth: 200 }}
+        >
+          <MenuItem value="">All Intakes</MenuItem>
+          {[
+            ...new Set(students.map((s) => s.enrollment_month).filter(Boolean)),
+          ].map((month) => (
+            <MenuItem key={month} value={month}>
+              {month}
+            </MenuItem>
+          ))}
+        </TextField>
+        <TextField
+          select
           label="Sort by"
           value={sortField}
           onChange={(e) => setSortField(e.target.value)}
@@ -240,92 +264,130 @@ const AdminStudents = () => {
           {sortOrder === "asc" ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
         </IconButton>
       </Box>
-      <Table sx={{ background: "#fff", borderRadius: 2, boxShadow: 1 }}>
-        <TableHead>
-          <TableRow>
-            <TableCell>
-              <BadgeIcon fontSize="small" /> Student #
-            </TableCell>
-            <TableCell>
-              <PersonIcon fontSize="small" /> Name
-            </TableCell>
-            <TableCell>
-              <EmailIcon fontSize="small" /> Email
-            </TableCell>
-            <TableCell>
-              <BadgeIcon fontSize="small" /> ID Number
-            </TableCell>
-            <TableCell>
-              <SchoolIcon fontSize="small" /> Courses
-            </TableCell>
-            <TableCell>Actions</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {filteredStudents.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={6} align="center">
-                <Chip label="No students found." color="warning" />
-              </TableCell>
-            </TableRow>
-          ) : (
-            filteredStudents.map((student) => (
-              <TableRow key={student.id} hover>
+
+      {students.length === 0 ? (
+        <Box sx={{ display: "flex", justifyContent: "center", py: 5 }}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        <Paper sx={{ borderRadius: 2, overflowX: "auto", boxShadow: 3 }}>
+          <Table sx={{ minWidth: 900 }}>
+            <TableHead>
+              <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
                 <TableCell>
-                  <Chip
-                    label={student.student_number || student.id}
-                    color="primary"
-                    size="small"
-                  />
+                  <BadgeIcon fontSize="small" /> Student #
                 </TableCell>
                 <TableCell>
-                  <Typography variant="subtitle1" fontWeight={500}>
-                    {student.first_name} {student.last_name}
-                  </Typography>
+                  <PersonIcon fontSize="small" /> Name
                 </TableCell>
                 <TableCell>
-                  <Typography variant="body2">{student.email}</Typography>
+                  <EmailIcon fontSize="small" /> Email
                 </TableCell>
                 <TableCell>
-                  <Chip
-                    label={student.id_number || "-"}
-                    color={student.id_number ? "success" : "default"}
-                    size="small"
-                  />
+                  <BadgeIcon fontSize="small" /> ID Number
                 </TableCell>
                 <TableCell>
-                  {student.enrolled_courses
-                    ? student.enrolled_courses.join(", ")
-                    : "-"}
+                  <SchoolIcon fontSize="small" /> Courses
                 </TableCell>
-                <TableCell>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    startIcon={<EditIcon />}
-                    sx={{ mr: 1 }}
-                    onClick={() => handleView(student)}
-                  >
-                    View/Edit
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="error"
-                    size="small"
-                    startIcon={<DeleteIcon />}
-                    onClick={() => {
-                      setSelectedStudent(student);
-                      setConfirmOpen(true);
-                    }}
-                  >
-                    Dismiss
-                  </Button>
-                </TableCell>
+                <TableCell>Intake Month</TableCell>
+                <TableCell>Actions</TableCell>
               </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
+            </TableHead>
+            <TableBody>
+              {filteredStudents.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} align="center">
+                    <Chip label="No students found." color="warning" />
+                  </TableCell>
+                </TableRow>
+              ) : (
+                // Group by intake month
+                (() => {
+                  const grouped = {};
+                  filteredStudents.forEach((student) => {
+                    const month = student.enrollment_month || "Unknown";
+                    if (!grouped[month]) grouped[month] = [];
+                    grouped[month].push(student);
+                  });
+                  return Object.entries(grouped).map(
+                    ([month, studentsInMonth]) => [
+                      <TableRow key={month} sx={{ backgroundColor: "#e3f2fd" }}>
+                        <TableCell
+                          colSpan={7}
+                          style={{ fontWeight: 600, color: "#1976d2" }}
+                        >
+                          Intake: {month}
+                        </TableCell>
+                      </TableRow>,
+                      ...studentsInMonth.map((student) => (
+                        <TableRow key={student.id} hover>
+                          <TableCell>
+                            <Chip
+                              label={student.student_number || student.id}
+                              color="primary"
+                              size="small"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="subtitle1" fontWeight={500}>
+                              {student.first_name} {student.last_name}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="body2">
+                              {student.email}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Chip
+                              label={student.id_number || "-"}
+                              color={student.id_number ? "success" : "default"}
+                              size="small"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            {student.enrolled_courses?.join(", ") || "-"}
+                          </TableCell>
+                          <TableCell>
+                            <Chip
+                              label={student.enrollment_month || "-"}
+                              color="info"
+                              size="small"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              variant="outlined"
+                              size="small"
+                              startIcon={<EditIcon />}
+                              sx={{ mr: 1 }}
+                              onClick={() => handleView(student)}
+                            >
+                              View/Edit
+                            </Button>
+                            <Button
+                              variant="contained"
+                              color="error"
+                              size="small"
+                              startIcon={<DeleteIcon />}
+                              onClick={() => {
+                                setSelectedStudent(student);
+                                setConfirmOpen(true);
+                              }}
+                            >
+                              Dismiss
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      )),
+                    ]
+                  );
+                })()
+              )}
+            </TableBody>
+          </Table>
+        </Paper>
+      )}
 
       {/* View/Edit Dialog */}
       <Dialog
@@ -336,94 +398,88 @@ const AdminStudents = () => {
       >
         <DialogTitle>Student Details</DialogTitle>
         <DialogContent>
-          <TextField
-            label="First Name"
-            name="first_name"
-            value={selectedStudent?.first_name || ""}
-            onChange={handleChange}
-            fullWidth
-            sx={{ mb: 2 }}
-          />
-          <TextField
-            label="Last Name"
-            name="last_name"
-            value={selectedStudent?.last_name || ""}
-            onChange={handleChange}
-            fullWidth
-            sx={{ mb: 2 }}
-          />
-          <TextField
-            label="Email"
-            name="email"
-            value={selectedStudent?.email || ""}
-            onChange={handleChange}
-            fullWidth
-            sx={{ mb: 2 }}
-          />
-          <TextField
-            label="ID Number"
-            name="id_number"
-            value={selectedStudent?.id_number || ""}
-            onChange={handleChange}
-            fullWidth
-            sx={{ mb: 2 }}
-            inputProps={{ maxLength: 13, pattern: "\\d{13}" }}
-            helperText="ID number must be exactly 13 digits"
-          />
-          <Typography variant="subtitle1" sx={{ mt: 2 }}>
-            Documents:
-          </Typography>
-          <div>
-            <strong>Qualification:</strong>{" "}
-            {selectedStudent?.qualification_file_url ? (
-              <a
-                href={selectedStudent.qualification_file_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ textDecoration: "none", color: "#1976d2" }}
-              >
-                View/Download
-              </a>
-            ) : (
-              <Typography variant="body2" color="text.secondary">
-                Not submitted
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            <TextField
+              label="First Name"
+              name="first_name"
+              value={selectedStudent?.first_name || ""}
+              onChange={handleChange}
+              fullWidth
+            />
+            <TextField
+              label="Last Name"
+              name="last_name"
+              value={selectedStudent?.last_name || ""}
+              onChange={handleChange}
+              fullWidth
+            />
+            <TextField
+              label="Email"
+              name="email"
+              value={selectedStudent?.email || ""}
+              onChange={handleChange}
+              fullWidth
+            />
+            <TextField
+              label="ID Number"
+              name="id_number"
+              value={selectedStudent?.id_number || ""}
+              onChange={handleChange}
+              fullWidth
+              inputProps={{ maxLength: 13, pattern: "\\d{13}" }}
+              helperText="ID number must be exactly 13 digits"
+            />
+            <Typography variant="subtitle1" sx={{ mt: 2 }}>
+              Documents:
+            </Typography>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+              <Typography>
+                <strong>Qualification:</strong>{" "}
+                {selectedStudent?.qualification_file_url ? (
+                  <a
+                    href={selectedStudent.qualification_file_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: "#1976d2" }}
+                  >
+                    View/Download
+                  </a>
+                ) : (
+                  <span style={{ color: "#888" }}>Not submitted</span>
+                )}
               </Typography>
-            )}
-          </div>
-          <div>
-            <strong>ID:</strong>{" "}
-            {selectedStudent?.id_file_url ? (
-              <a
-                href={selectedStudent.id_file_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ textDecoration: "none", color: "#1976d2" }}
-              >
-                View/Download
-              </a>
-            ) : (
-              <Typography variant="body2" color="text.secondary">
-                Not submitted
+              <Typography>
+                <strong>ID:</strong>{" "}
+                {selectedStudent?.id_file_url ? (
+                  <a
+                    href={selectedStudent.id_file_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: "#1976d2" }}
+                  >
+                    View/Download
+                  </a>
+                ) : (
+                  <span style={{ color: "#888" }}>Not submitted</span>
+                )}
               </Typography>
-            )}
-          </div>
-          <div>
-            <strong>CV:</strong>{" "}
-            {selectedStudent?.cv_file_url ? (
-              <a
-                href={selectedStudent.cv_file_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ textDecoration: "none", color: "#1976d2" }}
-              >
-                View/Download
-              </a>
-            ) : (
-              <Typography variant="body2" color="text.secondary">
-                Not submitted
+              <Typography>
+                <strong>CV:</strong>{" "}
+                {selectedStudent?.cv_file_url ? (
+                  <a
+                    href={selectedStudent.cv_file_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: "#1976d2" }}
+                  >
+                    View/Download
+                  </a>
+                ) : (
+                  <span style={{ color: "#888" }}>Not submitted</span>
+                )}
               </Typography>
-            )}
-          </div>
+            </Box>
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleSave} variant="contained">

@@ -132,13 +132,36 @@ const Training = () => {
   return (
     <PageWrapper>
       <Container sx={{ py: 5 }}>
-        <Typography variant="h3" gutterBottom>
+        <Typography
+          variant="h3"
+          gutterBottom
+          sx={{
+            fontWeight: 700,
+            letterSpacing: 1,
+            textAlign: { xs: "center", md: "left" },
+            animation: "fadeInDown 1s",
+            "@keyframes fadeInDown": {
+              from: { opacity: 0, transform: "translateY(-40px)" },
+              to: { opacity: 1, transform: "translateY(0)" },
+            },
+          }}
+        >
           Accredited Skills Development Courses – 2025 Intake
         </Typography>
-        <Typography variant="body1" sx={{ mb: 3 }}>
+        <Typography
+          variant="body1"
+          sx={{
+            mb: 3,
+            textAlign: { xs: "center", md: "left" },
+            animation: "fadeInUp 1.2s",
+            "@keyframes fadeInUp": {
+              from: { opacity: 0, transform: "translateY(40px)" },
+              to: { opacity: 1, transform: "translateY(0)" },
+            },
+          }}
+        >
           Empower your future with ETDP SETA-accredited programs that boost your
-          employability by <b>90%</b>!
-          <br />
+          employability by <b>90%</b>!<br />
           <b>Start Date:</b> 06 September 2025
           <br />
           <b>Schedule:</b> Saturdays – Sept 06, 13, 20 & 27 | 08h30–15h00
@@ -149,13 +172,12 @@ const Training = () => {
         </Typography>
         <Grid container spacing={4}>
           {courses.map((course, idx) => (
-            <Grid item xs={12} md={6} key={course.title}>
+            <Grid item xs={12} sm={12} md={6} key={course.title}>
               <Card
                 sx={{
                   boxShadow: 3,
-                  transition: "0.2s",
-                  "&:hover": { boxShadow: 6 },
-                  minHeight: 320,
+                  borderRadius: 3,
+                  minHeight: { xs: 260, md: 320 },
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "flex-end",
@@ -165,18 +187,25 @@ const Training = () => {
                   position: "relative",
                   color: "white",
                   overflow: "hidden",
+                  transition: "all 0.3s cubic-bezier(.4,0,.2,1)",
+                  boxShadow: "0 4px 24px 0 rgba(25,118,210,0.15)",
+                  "&:hover": {
+                    transform: "scale(1.04)",
+                    boxShadow: "0 8px 32px 0 rgba(25,118,210,0.25)",
+                  },
                 }}
               >
                 <Box
                   sx={{
                     position: "absolute",
                     inset: 0,
-                    background: "rgba(25, 118, 210, 0.65)",
+                    background:
+                      "linear-gradient(120deg, rgba(25,118,210,0.7) 60%, rgba(25,118,210,0.4) 100%)",
                     zIndex: 1,
                   }}
                 />
                 <CardContent sx={{ position: "relative", zIndex: 2 }}>
-                  <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+                  <Typography variant="h5" sx={{ fontWeight: 700 }}>
                     {course.title}
                   </Typography>
                   <Typography variant="body2" sx={{ mb: 1 }}>
@@ -192,18 +221,28 @@ const Training = () => {
                     variant="outlined"
                     color="inherit"
                     onClick={() => handleExpandClick(idx)}
-                    sx={{ mb: 1, borderColor: "white", color: "white" }}
+                    sx={{
+                      mb: 1,
+                      borderColor: "white",
+                      color: "white",
+                      fontWeight: 600,
+                      backdropFilter: "blur(2px)",
+                    }}
                   >
                     {expanded[idx]
                       ? "Hide Career Opportunities"
                       : "Show Career Opportunities"}
                   </Button>
                   <Collapse in={expanded[idx]}>
-                    <Box sx={{ mt: 1 }}>
-                      <Typography
-                        variant="subtitle2"
-                        sx={{ fontWeight: "bold" }}
-                      >
+                    <Box
+                      sx={{
+                        mt: 1,
+                        background: "rgba(255,255,255,0.08)",
+                        borderRadius: 2,
+                        p: 1,
+                      }}
+                    >
+                      <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
                         Career Opportunities:
                       </Typography>
                       <ul style={{ margin: 0, paddingLeft: "1.2em" }}>
@@ -218,8 +257,13 @@ const Training = () => {
                   <Button
                     variant="contained"
                     color="success"
-                    sx={{ fontWeight: "bold", mt: 2 }}
-                    onClick={() => navigate("/application")} // <-- use lowercase
+                    sx={{
+                      fontWeight: 700,
+                      mt: 2,
+                      boxShadow: 1,
+                      backdropFilter: "blur(2px)",
+                    }}
+                    onClick={() => navigate("/application")}
                   >
                     Apply
                   </Button>

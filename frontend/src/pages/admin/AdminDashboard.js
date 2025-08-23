@@ -1,9 +1,25 @@
 import React, { useEffect, useState } from "react";
-import { Container, Typography, Paper, Grid, Button } from "@mui/material";
+import { Container, Typography, Paper, Grid, Button, Box } from "@mui/material";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import SchoolIcon from "@mui/icons-material/School";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import { useNavigate } from "react-router-dom";
+
+const cardStyles = {
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  p: 4,
+  minWidth: 220,
+  borderRadius: 3,
+  color: "#fff",
+  transition: "transform 0.2s, box-shadow 0.2s",
+  "&:hover": {
+    transform: "scale(1.05)",
+    boxShadow: "0 12px 24px rgba(0,0,0,0.2)",
+  },
+};
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -15,12 +31,9 @@ const AdminDashboard = () => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const token = localStorage.getItem("adminToken"); // <-- FIXED
-    if (!token) {
-      navigate("/admin/login");
-      return;
-    }
-    // Fetch dashboard stats with authentication
+    const token = localStorage.getItem("adminToken");
+    if (!token) return navigate("/admin/login");
+
     const fetchStats = async () => {
       try {
         const [appsRes, studentsRes, coursesRes] = await Promise.all([
@@ -34,119 +47,147 @@ const AdminDashboard = () => {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
+
         if (
-          appsRes.status === 401 ||
-          studentsRes.status === 401 ||
-          coursesRes.status === 401
+          [appsRes, studentsRes, coursesRes].some((res) => res.status === 401)
         ) {
           setError("Unauthorized: Please login as admin.");
-          navigate("/admin/login");
-          return;
+          return navigate("/admin/login");
         }
+
         const apps = await appsRes.json();
         const students = await studentsRes.json();
         const courses = await coursesRes.json();
+
         setStats({
           applications: Array.isArray(apps)
             ? apps.length
-            : Array.isArray(apps.results)
-            ? apps.results.length
-            : 0,
+            : apps.results?.length || 0,
           students: Array.isArray(students)
             ? students.length
-            : Array.isArray(students.results)
-            ? students.results.length
-            : 0,
+            : students.results?.length || 0,
           courses: Array.isArray(courses)
             ? courses.length
-            : Array.isArray(courses.results)
-            ? courses.results.length
-            : 0,
+            : courses.results?.length || 0,
         });
       } catch {
         setError("Failed to load dashboard stats.");
       }
     };
+
     fetchStats();
   }, [navigate]);
 
-  if (error) return <div style={{ color: "red", padding: 20 }}>{error}</div>;
+  if (error)
+    return (
+      <Box sx={{ color: "red", p: 3, textAlign: "center" }}>
+        <Typography variant="h6">{error}</Typography>
+      </Box>
+    );
 
   return (
-    <Container sx={{ py: 5, textAlign: "center" }}>
-      <Typography variant="h3" gutterBottom>
-        Admin Dashboard
-      </Typography>
-      <Typography variant="body1" sx={{ mb: 4 }}>
-        Welcome to the administration panel. Here you can manage applications,
-        enroll students, and review course details.
-      </Typography>
-      <Grid container spacing={3} justifyContent="center" sx={{ mb: 4 }}>
-        <Grid item>
-          <Paper
-            elevation={3}
-            sx={{ p: 3, minWidth: 200, textAlign: "center" }}
-          >
-            <AssignmentIcon color="primary" sx={{ fontSize: 40, mb: 1 }} />
-            <Typography variant="h6">Applications</Typography>
-            <Typography variant="h4" color="primary">
-              {stats.applications}
-            </Typography>
-            <Button
-              variant="contained"
-              color="primary"
-              fullWidth
-              sx={{ mt: 2 }}
-              onClick={() => navigate("/admin/applications")}
+    <Box
+      sx={{
+        minHeight: "100vh",
+        background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
+        py: 6,
+      }}
+    >
+      <Container maxWidth="lg" sx={{ textAlign: "center" }}>
+        <Typography
+          variant="h3"
+          gutterBottom
+          sx={{ fontWeight: "bold", mb: 2 }}
+        >
+          Admin Dashboard
+        </Typography>
+        <Typography variant="body1" sx={{ mb: 5, maxWidth: 600, mx: "auto" }}>
+          Welcome to the administration panel. Manage applications, enroll
+          students, and review courses efficiently.
+        </Typography>
+
+        <Grid container spacing={4} justifyContent="center">
+          {/* Applications Card */}
+          <Grid item>
+            <Paper
+              sx={{
+                ...cardStyles,
+                background: "linear-gradient(135deg, #667eea, #764ba2)",
+              }}
             >
-              Manage Applications
-            </Button>
-          </Paper>
-        </Grid>
-        <Grid item>
-          <Paper
-            elevation={3}
-            sx={{ p: 3, minWidth: 200, textAlign: "center" }}
-          >
-            <SchoolIcon color="success" sx={{ fontSize: 40, mb: 1 }} />
-            <Typography variant="h6">Students</Typography>
-            <Typography variant="h4" color="success.main">
-              {stats.students}
-            </Typography>
-            <Button
-              variant="contained"
-              color="success"
-              fullWidth
-              sx={{ mt: 2 }}
-              onClick={() => navigate("/admin/students")}
+              <AssignmentIcon sx={{ fontSize: 50, mb: 1 }} />
+              <Typography variant="h6" sx={{ mb: 1 }}>
+                Applications
+              </Typography>
+              <Typography variant="h3" sx={{ fontWeight: "bold", mb: 2 }}>
+                {stats.applications}
+              </Typography>
+              <Button
+                variant="contained"
+                color="secondary"
+                sx={{ borderRadius: 3, px: 4 }}
+                onClick={() => navigate("/admin/applications")}
+              >
+                Manage Applications
+              </Button>
+            </Paper>
+          </Grid>
+
+          {/* Students Card */}
+          <Grid item>
+            <Paper
+              sx={{
+                ...cardStyles,
+                background: "linear-gradient(135deg, #43cea2, #185a9d)",
+              }}
             >
-              View Students
-            </Button>
-          </Paper>
-        </Grid>
-        <Grid item>
-          <Paper
-            elevation={3}
-            sx={{ p: 3, minWidth: 200, textAlign: "center" }}
-          >
-            <MenuBookIcon color="secondary" sx={{ fontSize: 40, mb: 1 }} />
-            <Typography variant="h6">Courses</Typography>
-            <Typography variant="h4" color="secondary">
-              {stats.courses}
-            </Typography>
-            <Button
-              variant="contained"
-              color="secondary"
-              fullWidth
-              sx={{ mt: 2 }}
-              onClick={() => navigate("/admin/courses")}
+              <SchoolIcon sx={{ fontSize: 50, mb: 1 }} />
+              <Typography variant="h6" sx={{ mb: 1 }}>
+                Students
+              </Typography>
+              <Typography variant="h3" sx={{ fontWeight: "bold", mb: 2 }}>
+                {stats.students}
+              </Typography>
+              <Button
+                variant="contained"
+                color="secondary"
+                sx={{ borderRadius: 3, px: 4 }}
+                onClick={() => navigate("/admin/students")}
+              >
+                View Students
+              </Button>
+            </Paper>
+          </Grid>
+
+          {/* Courses Card */}
+          <Grid item>
+            <Paper
+              sx={{
+                ...cardStyles,
+                background: "linear-gradient(135deg, #f7971e, #ffd200)",
+                color: "#333",
+              }}
             >
-              View Courses
-            </Button>
-          </Paper>
+              <MenuBookIcon sx={{ fontSize: 50, mb: 1 }} />
+              <Typography variant="h6" sx={{ mb: 1 }}>
+                Courses
+              </Typography>
+              <Typography variant="h3" sx={{ fontWeight: "bold", mb: 2 }}>
+                {stats.courses}
+              </Typography>
+              <Button
+                variant="contained"
+                color="secondary"
+                sx={{ borderRadius: 3, px: 4 }}
+                onClick={() => navigate("/admin/courses")}
+              >
+                View Courses
+              </Button>
+            </Paper>
+          </Grid>
         </Grid>
-      </Grid>
-    </Container>
+      </Container>
+    </Box>
   );
 };
 

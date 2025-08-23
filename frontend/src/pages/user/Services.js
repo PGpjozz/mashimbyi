@@ -74,22 +74,57 @@ const Services = () => {
 
   return (
     <Container sx={{ py: 5 }}>
-      <Typography variant="h3" gutterBottom>
+      <Typography
+        variant="h3"
+        gutterBottom
+        sx={{
+          fontWeight: 700,
+          letterSpacing: 1,
+          textAlign: { xs: "center", md: "left" },
+          animation: "fadeInDown 1s",
+          "@keyframes fadeInDown": {
+            from: { opacity: 0, transform: "translateY(-40px)" },
+            to: { opacity: 1, transform: "translateY(0)" },
+          },
+        }}
+      >
         Our Services
       </Typography>
-      <Typography variant="body1" sx={{ mb: 3 }}>
+      <Typography
+        variant="body1"
+        sx={{
+          mb: 3,
+          textAlign: { xs: "center", md: "left" },
+          animation: "fadeInUp 1.2s",
+          "@keyframes fadeInUp": {
+            from: { opacity: 0, transform: "translateY(40px)" },
+            to: { opacity: 1, transform: "translateY(0)" },
+          },
+        }}
+      >
         Sogwa Solutions offers a wide range of practical and business services
         to individuals, organizations, and communities. Contact us for quality,
         reliability, and professionalism in every service we deliver.
       </Typography>
       <Grid container spacing={4}>
         {services.map((service) => (
-          <Grid item xs={12} md={6} key={service.title}>
+          <Grid item xs={12} sm={12} md={6} key={service.title}>
             <Card
               sx={{
                 boxShadow: 3,
-                transition: "0.2s",
-                "&:hover": { boxShadow: 6 },
+                borderRadius: 3,
+                minHeight: { xs: 220, md: 260 },
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "flex-end",
+                position: "relative",
+                overflow: "hidden",
+                transition: "all 0.3s cubic-bezier(.4,0,.2,1)",
+                boxShadow: "0 4px 24px 0 rgba(25,118,210,0.10)",
+                "&:hover": {
+                  transform: "scale(1.03)",
+                  boxShadow: "0 8px 32px 0 rgba(25,118,210,0.18)",
+                },
               }}
             >
               <CardMedia
@@ -97,18 +132,19 @@ const Services = () => {
                 height="180"
                 image={service.image}
                 alt={service.title}
-                sx={{ objectFit: "cover" }}
+                sx={{ objectFit: "cover", filter: "brightness(0.92)" }}
               />
               <CardContent>
-                <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+                <Typography variant="h5" sx={{ fontWeight: 700 }}>
                   {service.title}
                 </Typography>
                 <Typography variant="body2" sx={{ mb: 2 }}>
                   {service.description}
                 </Typography>
                 <Button
-                  variant="outlined"
+                  variant="contained"
                   color="primary"
+                  sx={{ fontWeight: 700, boxShadow: 1, mt: 1, borderRadius: 2 }}
                   onClick={() => navigate("/contact")}
                 >
                   Enquire

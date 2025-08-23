@@ -31,6 +31,7 @@ class ApplicationViewSet(viewsets.ModelViewSet):
             qualification_file=application.qualification_doc,
             id_file=application.id_doc,
             cv_file=application.cv,
+            enrollment_month=getattr(application, 'enrollment_month', None),
         )
         # Optionally set student_number or enrolled_courses here
         student.enrolled_courses.add(application.course)

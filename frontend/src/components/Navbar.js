@@ -119,8 +119,43 @@ const Navbar = () => {
         anchor="right"
         open={mobileOpen}
         onClose={() => setMobileOpen(false)}
+        PaperProps={{
+          sx: {
+            background: "linear-gradient(120deg, #1976d2 70%, #43ea7d 100%)",
+            color: "white",
+          },
+        }}
       >
-        <Box sx={{ width: 250 }} role="presentation">
+        <Box sx={{ width: 250, py: 2 }} role="presentation">
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              mb: 2,
+            }}
+          >
+            <Box
+              component="img"
+              src={logo}
+              alt="Logo"
+              sx={{
+                height: 40,
+                width: 40,
+                borderRadius: "50%",
+                background: "#fff",
+                p: 1,
+                boxShadow: 2,
+                mr: 1,
+              }}
+            />
+            <Typography
+              variant="h6"
+              sx={{ fontWeight: "bold", fontSize: "1.1rem", color: "white" }}
+            >
+              Sogwa Solutions
+            </Typography>
+          </Box>
           <List>
             {navItems.map((item) => (
               <ListItem
@@ -129,6 +164,10 @@ const Navbar = () => {
                 to={item.path}
                 key={item.label}
                 onClick={() => setMobileOpen(false)}
+                sx={{
+                  color: "white",
+                  "&:hover": { background: "rgba(255,255,255,0.08)" },
+                }}
               >
                 <ListItemText primary={item.label} />
               </ListItem>
@@ -138,9 +177,29 @@ const Navbar = () => {
               component={Link}
               to="/contact"
               onClick={() => setMobileOpen(false)}
+              sx={{
+                color: "white",
+                "&:hover": { background: "rgba(255,255,255,0.08)" },
+              }}
             >
               <ListItemText primary="Enquire Now" />
             </ListItem>
+            {showApplyNow && (
+              <ListItem
+                button
+                component={Link}
+                to="/application"
+                onClick={() => setMobileOpen(false)}
+                sx={{
+                  color: "#43ea7d",
+                  fontWeight: 700,
+                  mt: 1,
+                  "&:hover": { background: "rgba(67,234,125,0.12)" },
+                }}
+              >
+                <ListItemText primary="Apply Now" />
+              </ListItem>
+            )}
           </List>
         </Box>
       </Drawer>

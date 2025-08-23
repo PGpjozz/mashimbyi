@@ -61,11 +61,27 @@ const Home = () => {
             sx={{
               fontSize: { xs: "2rem", md: "3rem" },
               fontWeight: "bold",
+              letterSpacing: 1,
+              animation: "fadeInDown 1s",
+              "@keyframes fadeInDown": {
+                from: { opacity: 0, transform: "translateY(-40px)" },
+                to: { opacity: 1, transform: "translateY(0)" },
+              },
             }}
           >
             Empowering Skills. Enabling Growth.
           </Typography>
-          <Typography variant="h6" sx={{ mt: 2 }}>
+          <Typography
+            variant="h6"
+            sx={{
+              mt: 2,
+              animation: "fadeInUp 1.2s",
+              "@keyframes fadeInUp": {
+                from: { opacity: 0, transform: "translateY(40px)" },
+                to: { opacity: 1, transform: "translateY(0)" },
+              },
+            }}
+          >
             Accredited Training & Professional Services for Community Growth
           </Typography>
         </Box>
@@ -80,7 +96,7 @@ const Home = () => {
                 p: 3,
                 textAlign: "center",
                 boxShadow: 3,
-                minHeight: 320,
+                minHeight: { xs: 260, md: 320 },
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "flex-end",
@@ -90,34 +106,46 @@ const Home = () => {
                 position: "relative",
                 color: "white",
                 overflow: "hidden",
-                "&:hover": { transform: "scale(1.03)", boxShadow: 6 },
-                transition: "all 0.3s ease",
+                borderRadius: 3,
+                transition: "all 0.3s cubic-bezier(.4,0,.2,1)",
+                boxShadow: "0 4px 24px 0 rgba(25,118,210,0.15)",
+                "&:hover": {
+                  transform: "scale(1.04)",
+                  boxShadow: "0 8px 32px 0 rgba(25,118,210,0.25)",
+                },
               }}
             >
               <Box
                 sx={{
                   position: "absolute",
                   inset: 0,
-                  background: "rgba(25, 118, 210, 0.65)",
+                  background:
+                    "linear-gradient(120deg, rgba(25,118,210,0.7) 60%, rgba(25,118,210,0.4) 100%)",
                   zIndex: 1,
                 }}
               />
               <CardContent sx={{ position: "relative", zIndex: 2 }}>
-                <FaChalkboardTeacher size={40} color="#fff" />
-                <Typography variant="h5" gutterBottom>
+                <FaChalkboardTeacher
+                  size={44}
+                  color="#fff"
+                  style={{ marginBottom: 8 }}
+                />
+                <Typography variant="h5" gutterBottom sx={{ fontWeight: 700 }}>
                   Training Programmes
                 </Typography>
-                <Typography>
-                  Accredited courses in Facilitator, Assessor,Moderator and
+                <Typography sx={{ mb: 2 }}>
+                  Accredited courses in Facilitator, Assessor, Moderator and
                   more.
                 </Typography>
                 <Button
                   variant="contained"
                   sx={{
-                    mt: 2,
+                    mt: 1,
                     backgroundColor: "#fff",
                     color: "#1976d2",
                     fontWeight: "bold",
+                    boxShadow: 1,
+                    "&:hover": { backgroundColor: "#e3e3e3" },
                   }}
                   onClick={() => navigate("/training")}
                 >
@@ -132,7 +160,7 @@ const Home = () => {
                 p: 3,
                 textAlign: "center",
                 boxShadow: 3,
-                minHeight: 320,
+                minHeight: { xs: 260, md: 320 },
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "flex-end",
@@ -142,34 +170,42 @@ const Home = () => {
                 position: "relative",
                 color: "white",
                 overflow: "hidden",
-                "&:hover": { transform: "scale(1.03)", boxShadow: 6 },
-                transition: "all 0.3s ease",
+                borderRadius: 3,
+                transition: "all 0.3s cubic-bezier(.4,0,.2,1)",
+                boxShadow: "0 4px 24px 0 rgba(255,152,0,0.15)",
+                "&:hover": {
+                  transform: "scale(1.04)",
+                  boxShadow: "0 8px 32px 0 rgba(255,152,0,0.25)",
+                },
               }}
             >
               <Box
                 sx={{
                   position: "absolute",
                   inset: 0,
-                  background: "rgba(255, 152, 0, 0.65)",
+                  background:
+                    "linear-gradient(120deg, rgba(255,152,0,0.7) 60%, rgba(255,152,0,0.4) 100%)",
                   zIndex: 1,
                 }}
               />
               <CardContent sx={{ position: "relative", zIndex: 2 }}>
-                <FaTools size={40} color="#fff" />
-                <Typography variant="h5" gutterBottom>
+                <FaTools size={44} color="#fff" style={{ marginBottom: 8 }} />
+                <Typography variant="h5" gutterBottom sx={{ fontWeight: 700 }}>
                   Business Services
                 </Typography>
-                <Typography>
-                  From event planning to cellphones repair and custom products.
+                <Typography sx={{ mb: 2 }}>
+                  From event planning to cellphone repair and custom products.
                 </Typography>
                 <Button
                   variant="contained"
                   color="secondary"
                   sx={{
-                    mt: 2,
+                    mt: 1,
                     backgroundColor: "#fff",
                     color: "#FF9800",
                     fontWeight: "bold",
+                    boxShadow: 1,
+                    "&:hover": { backgroundColor: "#ffe0b2" },
                   }}
                   onClick={() => navigate("/services")}
                 >
