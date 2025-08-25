@@ -277,7 +277,9 @@ const AdminApplications = () => {
               ) : (
                 filteredApplications.map((app) => (
                   <TableRow key={app.id} hover>
-                    <TableCell>{`${app.first_name} ${app.middle_name} ${app.surname}`}</TableCell>
+                    <TableCell>{`${app.first_name} ${
+                      app.middle_name ? app.middle_name : ""
+                    } ${app.surname}`}</TableCell>
                     <TableCell>{app.email}</TableCell>
                     <TableCell>{app.phone}</TableCell>
                     <TableCell>

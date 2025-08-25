@@ -67,7 +67,17 @@ def submit_application(request):
 
     serializer = ApplicationSerializer(data=data)
     if serializer.is_valid():
-        serializer.save()
+        application = serializer.save()
+
+        # Email notification
+        from django.core.mail import send_mail
+        from django.conf import settings
+        subject = "New Application Submitted"
+        message = f"A new application has been submitted.\n\nName: {application.first_name} {application.middle_name} {application.surname}\nEmail: {application.email}\nPhone: {application.phone}\nCourse: {application.course}\nEnrollment Month: {getattr(application, 'enrollment_month', '')}"
+        recipient_list = ["miyelaniclimate@gmail.com"]  # Send notification to your personal email
+        print("Sending notification email to", recipient_list)
+        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, recipient_list, fail_silently=False)
+
         return Response({"message": "Application submitted successfully"})
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
