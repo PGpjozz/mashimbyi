@@ -59,7 +59,10 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # React dev server
+    "https://sogwa.vercel.app",
+    "http://localhost:3000",
+    "https://sogwasolutions.co.za",
+    "https://www.sogwasolutions.co.za",
 ]
 
 # ------------------------------------------------------
@@ -146,3 +149,4 @@ REST_FRAMEWORK = {
 # Primary Key Default
 # ------------------------------------------------------
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+STATIC_ROOT = BASE_DIR / 'staticfiles'

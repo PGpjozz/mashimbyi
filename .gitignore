@@ -1,2 +1,8 @@
+venv/
 server/venv/
+.env
+*.pyc
+__pycache__/
+db.sqlite3
 server/.env
+venv_backup/
