@@ -13,6 +13,44 @@ import {
   Paper,
 } from "@mui/material";
 
+const applicantNotice = (
+  <Paper
+    elevation={4}
+    sx={{ p: 3, mb: 4, borderRadius: 2, background: "#f5f7fa" }}
+  >
+    <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1 }} color="primary">
+      Important Information for Applicants
+    </Typography>
+    <Typography variant="body1" sx={{ mb: 1 }}>
+      You may pay your deposit at any time after submitting your application.
+      However,{" "}
+      <strong>
+        full payment must be completed before the start of training
+      </strong>
+      .
+    </Typography>
+    <Typography variant="body1" sx={{ mb: 1 }}>
+      <strong>Bank Details:</strong>
+      <br />
+      Capitec Bank
+      <br />
+      Account No: 10541111537
+      <br />
+      Account Holder: Sogwa Solutions Pty Ltd
+    </Typography>
+    <Typography variant="body1" sx={{ mb: 1 }}>
+      <strong>
+        Proof of payment must be forwarded via WhatsApp to 083 583 6842 in order
+        for your application to be considered.
+      </strong>
+    </Typography>
+    <Typography variant="body1">
+      Your timetable will be communicated to you only after you have been
+      accepted into a program.
+    </Typography>
+  </Paper>
+);
+
 const qualifications = [
   "Grade 11",
   "Grade 12",
@@ -169,6 +207,7 @@ const Application = () => {
       }}
     >
       <Container maxWidth="sm">
+        {applicantNotice}
         <Paper
           elevation={6}
           sx={{
